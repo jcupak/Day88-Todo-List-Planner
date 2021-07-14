@@ -1,0 +1,51 @@
+{% extends 'bootstrap/base.html' %}
+
+{% block styles %}
+{{ super() }}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/etp_styles.css') }}" />
+{% endblock %}
+
+{% block title %}Emergent Task Planner TODOs{% endblock %}
+
+{% block content %}
+
+    <!-- TODO 1: Display ETP background image          -->
+    <!-- Background image is in static/images folder   -->
+    <img src="{{ url_for('static', filename='images/ETP.png') }}" />
+
+    <!-- TODO 2: Write today's date                    -->
+    <!-- Expects date string as Day, Month DD, YYYY    -->
+    <p class="date">{{ date }} </p>
+
+    <!-- TODO 3: Write Column 1 - grid start times     -->
+    <!-- Expects array with military and standard times -->
+    <div class="time">
+        {% for time in times %}
+            <p class="{{ time.military }}">{{ time.standard }}</p>
+        {% endfor %}
+    </div>
+
+    <!-- TODO 4: Write Column 2 - task schedule 60 minute blocks -->
+    <!-- Ignored - only 15-minute blobs entered                 -->
+
+    <!-- TODO 5: Write Column 3 - task schedule 15 minute blocks -->
+    <!-- Expects task start time and number of 15 minute blocks  -->
+    {% for task in tasks %}
+        {% for blocks in task.blocks %}
+            <div class="block15 {{ task.start }}"></div>
+        {% endfor %}
+    {% endfor %}
+
+    <!-- TODO 6: Write Column 4 - task schedule and name blocks -->
+    <!-- Expects task start time, number of 15 minute blocks, and task name -->
+    {% for task in tasks %}
+        <div class="{{ task.start }} {{ task.duration }}">{{ task.name }}</div>
+    {% endfor %}
+
+    <!-- TODO 3: Write Column 5 - task names / descriptions     -->
+    <!-- Expect task number and name / description              -->
+    {% for task in tasks %}
+        <p class="task {{ task.number }}">{{ task.name }}</p>
+    {% endfor %}
+
+{% endblock %}
