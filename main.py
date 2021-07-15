@@ -10,14 +10,29 @@
 ###########################################################################################
 
 # Imports
-from tkinter import Tk, Frame, Label, Entry, Listbox, Button
+from tkinter import Tk, Frame, LabelFrame, Label, Entry, Listbox, Button
 
 class Tasks(Frame):
 
     def __init__(root, master):
         Frame.__init__(root, master)
         root.grid()
+        root.create_instructions()
         root.create_widgets()
+
+    def create_instructions(root):
+        """Displays the TO DO list instructions """
+
+        instructions_frame = LabelFrame(root, text="ETP TO DO List Instructions", width=580, padx=5, pady=5)
+        instructions_frame.grid(row=0,column=0)
+
+        instructions_text = """Enter the Task Description, select the Start time, select the Duration in minutes,
+and select the Priority of each task (up to nine), and click on the SUBMIT button.
+
+NOTE: Please ensure that the start time of a task does not overlap any prior task."""
+
+        instructions_label = Label(instructions_frame, text=instructions_text, anchor='w', justify='left', bg="white", fg="black", padx=5, pady=5)
+        instructions_label.grid(row=0, column=0)
 
 
     def get_tasks(root):
@@ -60,19 +75,23 @@ class Tasks(Frame):
     def create_widgets(root):
         """Creates to do task Label, Entry, Listbox, and Button widgets"""
 
+        # Create frame for task entry widgets
+        widgets_frame = LabelFrame(root, text="ETP TO DO List Tasks", width=580, padx=5, pady=5)
+        widgets_frame.grid(row=1, column=0)
+
         root.tasks = []  # All task widgets
 
         # Create and display column header labels
-        task_name_label = Label(root, text="Task Description", font=("Arial", 12, "bold"), fg="black")
+        task_name_label = Label(widgets_frame, text="Task Description", font=("Arial", 12, "bold"), fg="black")
         task_name_label.grid(row=0, column=0, padx=50, sticky='w' + 'e' + 'n' + 's')
 
-        task_start_label = Label(root, text="Start", font=("Arial", 12, "bold"), fg="black")
+        task_start_label = Label(widgets_frame, text="Start", font=("Arial", 12, "bold"), fg="black")
         task_start_label.grid(row=0, column=1, padx=3, sticky='w' + 'e' + 'n' + 's')
 
-        task_duration_label = Label(root, text="Duration", font=("Arial", 12, "bold"), fg="black")
+        task_duration_label = Label(widgets_frame, text="Duration", font=("Arial", 12, "bold"), fg="black")
         task_duration_label.grid(row=0, column=2, padx=5, sticky='w' + 'e' + 'n' + 's')
 
-        task_priority_label = Label(root, text="Priority", font=("Arial", 12, "bold"), fg="black")
+        task_priority_label = Label(widgets_frame, text="Priority", font=("Arial", 12, "bold"), fg="black")
         task_priority_label.grid(row=0, column=3, padx=5, sticky='w' + 'e' + 'n' + 's')
 
         # Create time list_items
@@ -81,7 +100,7 @@ class Tasks(Frame):
         hour = 8
         minutes = 0
         period = "AM"  # Morning or afternoon
-        # Create list items from 8:00 AM start time to 9:45 PM in 15 minute increments
+        # Create 56 time list items from 8:00 AM start time to 9:45 PM in 15 minute increments
         for quarter in range(56):
             times.append(f"{hour:2}:{minutes:02} {period}")  # HH:MM AM/PM
             # Set up next time item
@@ -100,19 +119,20 @@ class Tasks(Frame):
         durations = [15, 30, 45, 60, 120, 180, 240]  # minutes
         priorities = [" Low", " Medium", " High"]
 
-        # Create nine task to do list entries
+        # Create nine to do list task entries
         for task_number in range(9):
 
             task = []  # Single task of name, start time, duration, and priority entries
 
             # Create task name/description entry
-            name_entry = Entry(root, width=30)
+            name_entry = Entry(widgets_frame, width=30, borderwidth=1, relief='solid')
             name_entry.grid(row=task_number + 2, column=0, padx=2, pady=2)
             task.append(name_entry)
 
             # Create task start times listbox
-            # NOTE: exportselection=0 important to allow multiple listbox selections
-            start_time = Listbox(root, height=3, selectmode='SINGLE', width=8, exportselection=0)
+            # NOTE: exportselection=0 important to allow selection in multiple listboxes
+            # https://stackoverflow.com/questions/10048609/how-to-keep-selections-highlighted-in-a-tkinter-listbox
+            start_time = Listbox(widgets_frame, height=3, selectmode='SINGLE', width=8, exportselection=0)
             index = 0
             for item in times:
                 index += 1
@@ -121,7 +141,7 @@ class Tasks(Frame):
             task.append(start_time)
 
             # Create task duration listbox
-            duration = Listbox(root, height=3, selectmode='SINGLE', width=3, exportselection=0)
+            duration = Listbox(widgets_frame, height=3, selectmode='SINGLE', width=3, exportselection=0)
             index = 0
             for minutes in durations:
                 index += 1
@@ -130,7 +150,7 @@ class Tasks(Frame):
             task.append(duration)
 
             # Create task priority listbox
-            priority = Listbox(root, height=3, selectmode='SINGLE', width=6, exportselection=0)
+            priority = Listbox(widgets_frame, height=3, selectmode='SINGLE', width=6, exportselection=0)
             index = 0
             for task_priority in priorities:
                 index += 1
@@ -141,24 +161,16 @@ class Tasks(Frame):
             #  Append task widgets to main root
             root.tasks.append(task)
 
-        task_button = Button(root, text="Submit Tasks", command=root.get_tasks)
+        task_button = Button(widgets_frame, text="Submit Tasks", font=("Arial", 12, "bold"), padx=5, pady=5, bg="lavender", fg="black", relief='raised', command=root.get_tasks)
         task_button.grid(row=14, column=0)
 
-
-    # def create_instructions(root):
-    #     instructions_frame = Frame(root, width=600, height=400)
-    #     instructions_text = """This is the TODO list dialog for the Emergent Task Planner (ETP).
-    #     Enter the name/description, select the start time, select the duration in minutes,
-    #     and select the priority of each task (up to nine), and click on the SUBMIT button.
-    #     NOTE: Please ensure that the start time of a task does not overlap any prior task."""
-    #
-    #     Label(root)
 
     def run(root):
         root.mainloop()
 
 root = Tk()
 root.title('To Do Task Lists')
+root.geometry("525x725+700+300")  # Width x Height + xpos + ypos
 
 app = Tasks(root)
 app.run()
