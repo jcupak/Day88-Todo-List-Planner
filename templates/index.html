@@ -1,0 +1,77 @@
+{% extends 'bootstrap/base.html' %}
+
+{% block html_attribs %} lang="en" {% endblock %}
+
+{% block metas %}
+    <meta name="viewport"    content="width=device-width, initial-scale=1, user-scalable=no" />
+    <meta name="description" content="Day 88 To Do List Planner Main web page"               />
+	<meta name="author"      content="John J Cupak Jr, jcupak@acm.org"                       />
+{% endblock %}
+
+{% block styles %}
+{{super()}}
+<link rel="stylesheet" type=text/css"
+      href="{{ url_for('static', filename='css/index-styles.css') }}">
+<style type="text/css">
+    .wrapper {
+        width                 : calc(1900px / 2);
+        height                : calc(1267px / 2);
+        background-color      : lavender;
+        background-image      : url("static/images/home-bg.jpg");
+        background-size       : contain;
+        background-repeat     : no-repeat;
+        background-attachment : fixed;
+        background-position   : top left;
+        display               : flex;
+        align-items           : center;
+    }
+    .container {
+        width                 : 600px;
+        height                : 350px;
+        padding               : 10px;
+        display               : flex;
+        flex-direction        : column; /* vertical */
+        align-items           : center;
+    }
+    /*  Glassmorphism style from https://glassmorphism.com */
+    .glassmorphism {
+      background-color        : rgba( 255, 255, 255, 0.25 );
+      box-shadow              : 0 8px 32px 0 rgba( 31, 38, 135, 0.37 );
+      backdrop-filter         : blur( 4px );
+      -webkit-backdrop-filter : blur( 4px );
+      border-radius           : 10px;
+      border                  : 1px solid rgba( 255, 255, 255, 0.18 );
+    }
+</style>
+{% endblock %}
+
+{% block title %}ETP To Do List{% endblock %}
+
+{% block content %}
+<div class="wrapper">
+    <div class="container glassmorphism">
+        <h1 class="display-4">To Do List</h1>
+        <h2 class="display-3">Emergent Task Planner&trade; (ETP)</h2>
+        <p class="lead">Plan the day's tasks for the ETP</p>
+        <p>
+            Plan up to nine (9) tasks for the day with start times,
+            durations, and priorities.
+        </p>
+
+        <p class="my-3">
+            {% if exists %}
+            <a class="btn btn-primary btn-lg" role="button"
+                href="{{ url_for('tasks') }}">Show Tasks</a>
+            {% endif %}
+            <a class="btn btn-primary btn-lg" role="button"
+               href="{{ url_for('add_task') }}">Add Task</a>
+        </p>
+        <cite style="margin-top:15px;">
+            See <a href="https://davidseah.com/node/the-emergent-task-planner/"
+                   target="_blank">
+            The Emergent Task Planner&trade;</a> by D. Sri Seah for details.
+        </cite>
+
+    </div>
+</div>
+{% endblock %}

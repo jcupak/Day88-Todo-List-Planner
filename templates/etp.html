@@ -1,0 +1,77 @@
+{% extends 'bootstrap/base.html' %}
+
+{% block metas %}
+    <meta name="viewport"    content="width=device-width, initial-scale=1, user-scalable=no" />
+	<meta name="description" content="ETP with Bootstrap5">
+	<meta name="author"      content="John J Cupak Jr, jcupak@acm.org">
+{% endblock %}
+
+{% block styles %}
+{{ super() }}
+    <link rel="stylesheet"   type="text/css" media="screen, print"
+          href="{{ url_for('static', filename='css/etp-styles.css') }}" />
+    <link rel="stylesheet"   type="text/css" media="print"
+          href="{{ url_for('static', filename='css/etp-print-styles.css') }}" />
+{% endblock %}
+
+{% block title %}Emergent Task Planner TO DOs{% endblock %}
+
+{% block content %}
+
+    <!-- Display ETP background image -->
+    <img class="etp"
+         src="{{ url_for('static', filename='images/etp.png') }}" />
+
+    <!-- Write today's date                    -->
+    <!-- Expects date string as Day, Month DD, YYYY    -->
+    <p class="date">{{ date }}</p>
+
+    <!-- Write Column 1 - grid start times     -->
+    <div id="times">
+      <p class="time time08"> 8:00</p><!-- start -->
+      <p class="time time09"> 9:00</p>
+      <p class="time time10">10:00</p>
+      <p class="time time11">11:00</p>
+      <p class="time time12">12:00</p><!-- mid break -->
+      <p class="time time13"> 1:00</p>
+      <p class="time time14"> 2:00</p>
+      <p class="time time15"> 3:00</p>
+      <p class="time time16"> 4:00</p>
+      <p class="time time17"> 5:00</p><!-- late break -->
+      <p class="time time18"> 6:00</p>
+      <p class="time time19"> 7:00</p>
+      <p class="time time20"> 8:00</p>
+      <p class="time time21"> 9:00</p>
+    </div>
+
+    <!-- Write Column 2 - task schedule 60 minute blocks -->
+    <!-- Omitted -->
+
+    <!-- Write Column 3 - task schedule 15 minute blocks -->
+    <!-- Omitted -->
+
+    <!-- Write Column 4 - task schedule and name duration blocks -->
+    <!-- Expects preformatted task start time, duration, priority, and name/description -->
+    <div class="duration-blocks">
+        {% for task in tasks %}
+        <div class="duration {{task[2]}} {{task[4]}} {{task[8]}} text">{{ task[1] }}</div>
+        {% endfor %}
+    </div><!-- end class .duration-blocks -->
+
+    <!-- Priority legend -->
+    <div class="priority-legend">
+      <div class="legend                    text">Task Priority: </div>
+      <div class="legend-low    task-low    text">Low</div>
+      <div class="legend-medium task-medium text">Medium</div>
+      <div class="legend-high   task-high   text">High</div>
+    </div><!-- end class .priority-legend -->
+
+    <!-- Write Column 5 - task names / descriptions      -->
+    <!-- Expects preformatted task number, task name, and task priority -->
+    <div class="tasks">
+        {% for task in tasks %}
+            <p class="task task{{task[0]}} {{task[8]}}">{{ task[1] }}</p>
+        {% endfor %}
+    </div><!-- end class .tasks -->
+
+{% endblock %}

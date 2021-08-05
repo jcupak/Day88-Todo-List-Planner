@@ -1,0 +1,23 @@
+/******************************************************************************/
+/* Name    : etp-print-styles.css                                             */
+/* Author  : John J Cupak Jr                                                  */
+/* History : 2021-08-03 Created                                               */
+/******************************************************************************/
+
+/******************************************************************************/
+/* Override Task Priority bootstrap missing print colors                      */
+/******************************************************************************/
+
+/* https://stackoverflow.com/questions/3893986/css-media-print-issues-with-background-color */
+.task-low    {
+    background-color : #ffc !important; <!-- Override bootstrap -->
+    border-color     : #ff0 !important; <!-- Override bootstrap -->
+}
+.task-medium {
+    background-color : #cfc !important; <!-- Override bootstrap -->
+    border-color     : #0f0 !important; <!-- Override bootstrap -->
+}
+.task-high   {
+    background-color : #fcc !important; <!-- Override bootstrap -->
+    border-color     : #f00 !important; <!-- Override bootstrap -->
+}

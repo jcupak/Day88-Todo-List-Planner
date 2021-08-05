@@ -1,0 +1,84 @@
+{% extends 'bootstrap/base.html' %}
+{% import 'bootstrap/wtf.html' as wtf %}
+
+{% block html_attribs %} lang="en" {% endblock %}
+
+{% block metas %}
+    <meta name="viewport"    content="width=device-width, initial-scale=1, user-scalable=no" />
+    <meta name="description" content="Day 88 To Do List Planner Tasks Form web page"         />
+	<meta name="author"      content="John J Cupak Jr, jcupak@acm.org"                       />
+{% endblock %}
+
+{% block styles %}
+{{super()}}
+<style type="text/css">
+    .wrapper {
+        width                 : 640px;
+        height                : 424px;
+        background-image      : url("static/images/add-bg.jpg");
+        background-size       : 640px;
+        background-repeat     : no-repeat;
+        background-attachment : fixed;
+        background-position   : top left;
+        display               : flex;
+        flex-direction        : column;
+    }
+    h1 {
+        text-align            : center;
+    }
+    .container {
+        width                 : 640px;
+        display               : flex;
+        flex-direction        : row;
+        align-items           : flex-start;
+        justify-content       : space-between;
+    }
+    .instructions {
+        width                 : 300px;
+        height                : 180px;
+        padding               : 10px;
+    }
+    /*  Glassmorphism style from https://glassmorphism.com */
+    .glassmorphism {
+      background-color        : rgba( 255, 255, 255, 0.25 );
+      box-shadow              : 0 8px 32px 0 rgba( 31, 38, 135, 0.37 );
+      backdrop-filter         : blur( 4px );
+      -webkit-backdrop-filter : blur( 4px );
+      border-radius           : 10px;
+      border                  : 1px solid rgba( 255, 255, 255, 0.18 );
+    }
+    .form-wrapper {
+        background-color      : tan;
+      border-radius           : 10px;
+      border                  : 1px solid rgba( 255, 255, 255, 0.18 );
+        padding               :   5px;
+        width                 : 250px;
+    }
+</style>
+{% endblock %}
+
+{% block title %}ETP To Do Tasks Form{% endblock %}
+
+{% block content %}
+<div class="wrapper">
+    <h1 class="display-4">Create Task</h1>
+    <div class="container">
+        <div class="instructions glassmorphism col-sm-12 col-md-8">
+            <ol>
+                <li>Enter the <strong>Task Name</strong></li>
+                <li>Select the <strong>Start Time</strong></li>
+                <li>Select the <strong>Duration</strong> time in minutes</li>
+                <li>Select the <strong>Priority</strong></li>
+                <li>Click on the <strong>Submit Task</strong> button</li>
+            </ol>
+            <p>
+                <strong>NOTE:</strong> Please ensure that the start time
+                of a task does not overlap any prior task.
+            </p>
+        </div>
+        <div class="row form-wrapper">
+            {{ wtf.quick_form(form, novalidate=True) }}
+        </div>
+    </div>
+</div>
+{% endblock %}

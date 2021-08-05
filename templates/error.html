@@ -1,0 +1,76 @@
+{% extends 'bootstrap/base.html' %}
+
+{% block metas %}
+    <meta name="viewport"    content="width=device-width, initial-scale=1, user-scalable=no" />
+    <meta name="description" content="Day 88 To Do List Planner Error Page"                  />
+	<meta name="author"      content="John J Cupak Jr, jcupak@acm.org"                       />
+
+{% endblock %}
+
+{% block styles %}
+{{super()}}
+<style type="text/css">
+    .wrapper {
+        width                 : 640px;
+        height                : 457px;
+        background-image      : url("static/images/error-bg.jpg");
+        background-size       : 640px;
+        background-repeat     : no-repeat;
+        background-attachment : fixed;
+        background-position   : top left;
+        display               : flex;
+        align-items           : center;
+    }
+    .container {
+        width                 : 440px;
+        height                : 257px;
+        padding               : 10px;
+        display               : flex;
+        flex-direction        : column; /* vertical */
+        justify-contents      : center;
+        text-align            : center;
+    }
+    /*  Glassmorphism style from https://glassmorphism.com */
+    .glassmorphism {
+      background-color        : rgba( 255, 255, 255, 0.25 );
+      box-shadow              : 0 8px 32px 0 rgba( 31, 38, 135, 0.37 );
+      backdrop-filter         : blur( 4px );
+      -webkit-backdrop-filter : blur( 4px );
+      border-radius           : 10px;
+      border                  : 1px solid rgba( 255, 255, 255, 0.18 );
+    }
+    h1 {
+        color                 : white;
+    }
+    .text-danger {
+        font-size             : 16pt;
+        font-weight           : bold;
+        background-color      : white;
+        padding               : 5px;
+        border-radius         : 5px;
+    }
+</style>
+{% endblock %}
+
+{% block title %}TO DO Lists Error{% endblock %}
+
+{% block content %}
+<div class="wrapper">
+    <div class="container glassmorphism">
+        <div>
+            <h1 class="display-4">OOPS - TO DO Lists</h1>
+            <p class="text-danger">{{ message }}</p>
+            <p class="my-3">
+                <a  class="btn btn-primary btn-lg" role="button"
+                    href="{{ url_for('home') }}">Home Page</a>
+
+                <a class="btn btn-primary btn-lg" role="button"
+                   href="{{ url_for('tasks') }}">Show Tasks</a>
+
+                <a class="btn btn-primary btn-lg" role="button"
+                   href="{{ url_for('add_task') }}">Add Task</a>
+            </p>
+        </div>
+    </div>
+</div>
+{% endblock %}

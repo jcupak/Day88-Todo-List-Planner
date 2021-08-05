@@ -1,184 +1,373 @@
-###########################################################################################
-# Course:            100 Days of Code - The Complete Python Pro Bootcamp for 2021         #
-# Exercise:          Day 88 TODO List Planner                                             #
-# Description:       Collects daily task planner information and prints an ETP worksheet  #
-# Course Instructor: Angela Yu                                                            #
-# Author:            John Cupak                                                           #
-# History:           2021-06-28 Started                                                   #
-#                    2021-06-29 Completed create_widgets                                  #
-#                    2021-07-13 Created get_tasks                                         #
-###########################################################################################
+from flask import Flask, render_template, redirect, url_for
+from flask_bootstrap import Bootstrap
+from flask_wtf import FlaskForm
+from wtforms import StringField, SelectField, SubmitField
+from wtforms.validators import DataRequired
+from csv import writer, reader
+import os.path
+from datetime import date, datetime
 
-# Imports
-from tkinter import Tk, Frame, LabelFrame, Label, Entry, Listbox, Button
+app = Flask(__name__)
+app.config['SECRET_KEY'] = "python"
+Bootstrap(app)
 
-class Tasks(Frame):
-
-    def __init__(root, master):
-        Frame.__init__(root, master)
-        root.grid()
-        root.create_instructions()
-        root.create_widgets()
-
-    def create_instructions(root):
-        """Displays the TO DO list instructions """
-
-        instructions_frame = LabelFrame(root, text="ETP TO DO List Instructions", width=580, padx=5, pady=5)
-        instructions_frame.grid(row=0,column=0)
-
-        instructions_text = """Enter the Task Description, select the Start time, select the Duration in minutes,
-and select the Priority of each task (up to nine), and click on the SUBMIT button.
-
-NOTE: Please ensure that the start time of a task does not overlap any prior task."""
-
-        instructions_label = Label(instructions_frame, text=instructions_text, anchor='w', justify='left', bg="white", fg="black", padx=5, pady=5)
-        instructions_label.grid(row=0, column=0)
+times            = []                                        # Quarter hour times from 8:00AM to 9:45PM
+durations        = [(0, 15), (1, 30), (2, 45), (3, 60), (4, 120), (5, 180), (6, 240)]  # (value, label)
+quarter_hours    = [1, 2, 3, 4, 8, 12, 16]
+priorities       = [(0, "Low"), (1, "Medium"), (2, "High")]  # Task priorities
+end_time_index   = 0                                         # Index of previous task end time
+task_number      = 0                                         # Number of task: 1-9
 
 
-    def get_tasks(root):
-        """Callback extracts to do list task entries and passes data to etp.html web page"""
+def create_times():
+    """Fill times list with times from 8:00 AM to 9:45 PM"""
 
-        # TODO: Create and write todo.csv file
+    print("Creating times")
 
-        task_number = 0
-        for task in root.tasks:
+    # Set start time to 8:00 AM
+    hour = 8
+    minutes = 0
+    period = "AM"  # Morning or afternoon
 
-            todo = []  # Single to do task
-
-            # Exit task loop if current task name is blank
-            if len(task[0].get()) == 0:
-                break
-
-            task_number += 1
-            task_name = task[0].get()
-            start_index = task[1].curselection()[0]     # start_index number 0-95
-            start_time = task[1].get(start_index)       # start_time text 8:00 AM - 9:45 PM
-            duration_index = task[2].curselection()[0]  # duration index number 0-6
-            duration = task[2].get(duration_index)      # duration text 15-240 minutes
-            priority_index = task[3].curselection()[0]  # priority index number 0-2
-            priority = task[3].get(priority_index)      # priority text "low", "medium", or "high"
-
-            todo.append(task_number)
-            todo.append(task_name)
-            todo.append(start_index)
-            todo.append(start_time)
-            todo.append(duration_index)
-            todo.append(duration)
-            todo.append(priority_index)
-            todo.append(priority)
-
-            print(todo)  # Each to do task number, name, start_time, duration, priority
-
-        root.quit()  # All tasks extracted
+    # Create 56 time items from 8:00 AM to 10:00 PM in 15 minute increments
+    global times
+    for quarter in range(57):
+        time_str = f"{hour:2}:{minutes:02} {period}"
+        time_item = (quarter, time_str)
+        times.append(time_item)  # (0-55 'HH:MM AM/PM')
+        # Set up next time item
+        minutes += 15  # Increment by quarter hour
+        # Check if minutes equal to next hour
+        if minutes == 60:
+            hour += 1  # Increment hour
+            minutes = 0  # Reset minutes
+        # Check if 12 noon and change period designation
+        if hour == 12:
+            period = "PM"  # Change to afternoon
+        # Check if 24 hour time rolled over to afternoon
+        if hour == 13:  # Afternoon
+            hour = 1  # 1:00 PM
 
 
-    def create_widgets(root):
-        """Creates to do task Label, Entry, Listbox, and Button widgets"""
-
-        # Create frame for task entry widgets
-        widgets_frame = LabelFrame(root, text="ETP TO DO List Tasks", width=580, padx=5, pady=5)
-        widgets_frame.grid(row=1, column=0)
-
-        root.tasks = []  # All task widgets
-
-        # Create and display column header labels
-        task_name_label = Label(widgets_frame, text="Task Description", font=("Arial", 12, "bold"), fg="black")
-        task_name_label.grid(row=0, column=0, padx=50, sticky='w' + 'e' + 'n' + 's')
-
-        task_start_label = Label(widgets_frame, text="Start", font=("Arial", 12, "bold"), fg="black")
-        task_start_label.grid(row=0, column=1, padx=3, sticky='w' + 'e' + 'n' + 's')
-
-        task_duration_label = Label(widgets_frame, text="Duration", font=("Arial", 12, "bold"), fg="black")
-        task_duration_label.grid(row=0, column=2, padx=5, sticky='w' + 'e' + 'n' + 's')
-
-        task_priority_label = Label(widgets_frame, text="Priority", font=("Arial", 12, "bold"), fg="black")
-        task_priority_label.grid(row=0, column=3, padx=5, sticky='w' + 'e' + 'n' + 's')
-
-        # Create time list_items
-        times = []
-        # Set start time to 8:00 AM
-        hour = 8
-        minutes = 0
-        period = "AM"  # Morning or afternoon
-        # Create 56 time list items from 8:00 AM start time to 9:45 PM in 15 minute increments
-        for quarter in range(56):
-            times.append(f"{hour:2}:{minutes:02} {period}")  # HH:MM AM/PM
-            # Set up next time item
-            minutes += 15  # Increment by quarter hour
-            # Check if minutes equal to next hour
-            if minutes == 60:
-                hour += 1    # Increment hour
-                minutes = 0  # Reset minutes
-            # Check if 12 noon and change period designation
-            if hour == 12:
-                period = "PM"  # Change to afternoon
-            # Check if 24 hour rolled over to afternoon
-            if hour > 12:  # Afternoon
-                hour = 1  # 1:00 PM
-
-        durations = [15, 30, 45, 60, 120, 180, 240]  # minutes
-        priorities = [" Low", " Medium", " High"]
-
-        # Create nine to do list task entries
-        for task_number in range(9):
-
-            task = []  # Single task of name, start time, duration, and priority entries
-
-            # Create task name/description entry
-            name_entry = Entry(widgets_frame, width=30, borderwidth=1, relief='solid')
-            name_entry.grid(row=task_number + 2, column=0, padx=2, pady=2)
-            task.append(name_entry)
-
-            # Create task start times listbox
-            # NOTE: exportselection=0 important to allow selection in multiple listboxes
-            # https://stackoverflow.com/questions/10048609/how-to-keep-selections-highlighted-in-a-tkinter-listbox
-            start_time = Listbox(widgets_frame, height=3, selectmode='SINGLE', width=8, exportselection=0)
-            index = 0
-            for item in times:
-                index += 1
-                start_time.insert(index, item)
-            start_time.grid(row=task_number + 2, column=1, padx=2, pady=2)
-            task.append(start_time)
-
-            # Create task duration listbox
-            duration = Listbox(widgets_frame, height=3, selectmode='SINGLE', width=3, exportselection=0)
-            index = 0
-            for minutes in durations:
-                index += 1
-                duration.insert(index, minutes)
-            duration.grid(row=task_number + 2, column=2, padx=2, pady=2)
-            task.append(duration)
-
-            # Create task priority listbox
-            priority = Listbox(widgets_frame, height=3, selectmode='SINGLE', width=6, exportselection=0)
-            index = 0
-            for task_priority in priorities:
-                index += 1
-                priority.insert(index, task_priority)
-            priority.grid(row=task_number + 2, column=3, padx=2, pady=2)
-            task.append(priority)
-
-            #  Append task widgets to main root
-            root.tasks.append(task)
-
-        task_button = Button(widgets_frame, text="Submit Tasks", font=("Arial", 12, "bold"), padx=5, pady=5, bg="lavender", fg="black", relief='raised', command=root.get_tasks)
-        task_button.grid(row=14, column=0)
+# Define input task form
+class TaskForm(FlaskForm):
+    name = StringField('Task Name', validators=[DataRequired()])
+    start_time = SelectField("Start Time", choices=times)
+    duration = SelectField("Duration (minutes)", choices=durations)
+    priority = SelectField("Priority", choices=priorities)
+    submit = SubmitField("Submit Task")
 
 
-    def run(root):
-        root.mainloop()
+# Flask routes
+@app.route("/")
+def home():
+    """Main home page"""
 
-root = Tk()
-root.title('To Do Task Lists')
-root.geometry("525x725+700+300")  # Width x Height + xpos + ypos
+    iso_date = str(date.today())
+    filename = "etp_tasks_" + iso_date + ".csv"
 
-app = Tasks(root)
-app.run()
+    # Check to see if csv file exists
+    file_is_present = os.path.exists(filename)
 
-print("Time to pass to do data to web page")
-
-# @app.route("/todo", methods=["POST"])
+    return render_template("index.html", exists=file_is_present)
 
 
-# TODO 5: Pass today's tasks data to ETP web page
-# TODO 6: Print ETP web page with ETP background
+@app.route('/add', methods=["GET", "POST"])
+def add_task():
+    """Add Task Form page"""
+
+    print("Adding new task")
+
+    global times
+    if len(times) == 0:
+        create_times()
+
+    task_form = TaskForm()
+
+    # If task form has validated
+    if task_form.validate_on_submit():
+
+        print("Task Form validated")
+
+        # Get form fields
+        print("Extracting form fields")
+
+        task_name = task_form.name.data
+
+        start_time = task_form.start_time.data
+        start_time_index = int(start_time)
+        start_time_value = times[start_time_index][1]
+
+        duration = task_form.duration.data
+        duration_index = int(duration)
+        duration_value = durations[duration_index][1]
+
+        priority = task_form.priority.data
+        priority_index = int(priority)
+        priority_value = priorities[priority_index][1]
+
+        # Check for this task start time index does not overlap end time index of previous task
+        global end_time_index  # times
+
+        today = str(date.today())
+        filename = "etp_tasks_" + today + ".csv"
+
+        global task_number  # Number of task: 1-9
+
+        # If previous task end time index is zero;
+        # No previous task defined
+        if end_time_index == 0:
+
+            print("end_time_index == 0")
+
+            # ETP Tasks CSV file for today exists
+            # Open and get last task information
+            # Update last task end_time_index
+            if os.path.isfile(filename):
+
+                print(f"{filename} exists")
+
+                task_number = 0
+                with open(filename, mode='r') as task_file:
+                    tasks_csv_data = reader(task_file)
+                    for task in tasks_csv_data:
+                        task_number += 1  # Count tasks
+                    task_file.close()
+
+                end_time_index = start_time_index + quarter_hours[duration_index]  # Index of times
+                end_time_value = times[end_time_index][1]
+
+                task_number += 1  # Count new task from form
+                task_data = [task_number, task_name, start_time_index, start_time_value,
+                             duration_index, duration_value,
+                             end_time_index, end_time_value, priority_value]
+
+                # Now append new task form data
+                print("Appending new task to existing file")
+
+                with open(filename, mode="a") as task_file:
+                    writer_object = writer(task_file)
+                    writer_object.writerow(task_data)
+                    task_file.close()
+
+            # ETP Tasks CSV file for today does NOT exist
+            # Create and write task information
+            # Update last task end_time_index
+            else:
+
+                print(f"{filename} does NOT exist")
+
+                # Update end_time for this task
+                end_time_index = start_time_index + quarter_hours[duration_index]  # Index of times
+                end_time_value = times[end_time_index][1]
+
+                task_number = 1  # First task info
+                task_data = [task_number, task_name, start_time_index, start_time_value,
+                             duration_index, duration_value,
+                             end_time_index, end_time_value, priority_value]
+
+                # Now write first task information
+                print("Writing new task to new file")
+
+                with open(filename, mode="w") as task_file:
+                    writer_object = writer(task_file)
+                    writer_object.writerow(task_data)
+                    task_file.close()
+
+            print("Showing today's task(s)")
+            return redirect(url_for('tasks'))
+
+        # Previous task exists
+        # Check for task time overlap
+        else:
+
+            print("Previous task exists")
+            print(f"start_time_index = {start_time_index}, end_time_index = {end_time_index}")
+
+            # Check for task time overlap
+            if start_time_index < end_time_index:
+
+                print("ERROR: Task times overlap")
+
+                # ERROR: This task start time overlaps the previous task end time
+
+                previous_task_end_time = times[end_time_index][1]     # HH:MM AM/PM
+                current_task_start_time = times[start_time_index][1]  # HH:MM AM/PM
+                error_message = f"{current_task_start_time} start time of current task "\
+                                f"can not be before {previous_task_end_time} end time of previous task."
+                return render_template("error.html", message=error_message)
+
+            # No overlap - write current task info
+            else:
+
+                print("Task times do NOT overlap")
+
+                # ETP Tasks CSV file exists; append data
+                if os.path.isfile(filename):
+
+                    print(f"{filename} exists")
+
+                    # Update end_time for this task
+                    end_time_index = start_time_index + quarter_hours[duration_index]  # Index of times
+                    end_time_value = times[end_time_index][1]
+
+                    task_number += 1
+                    task_data = [task_number, task_name, start_time_index, start_time_value,
+                                 duration_index, duration_value,
+                                 end_time_index, end_time_value, priority_value]
+
+                    # Append this task data to existing file
+                    with open(filename, mode="a") as task_file:
+                        writer_object = writer(task_file)
+                        writer_object.writerow(task_data)
+                        task_file.close()
+
+                # ETP Tasks CSV file for today DOES NOT exists;
+                # create and write new task data
+                else:
+
+                    print(f"{filename} does NOT exists")
+
+                    # ETP Tasks CSV file for today does NOT exist; create it
+
+                    # Update end_time for this task
+                    end_time_index = start_time_index + quarter_hours[duration_index]  # Index of times
+                    end_time_value = times[end_time_index][1]
+
+                    task_number += 1
+                    task_data = [task_number, task_name, start_time_index, start_time_value,
+                                 duration_index, duration_value,
+                                 end_time_index, end_time_value, priority_value]
+
+                    # Write new file with this task data
+                    with open(filename, mode="w") as task_file:
+                        writer_object = writer(task_file)
+                        writer_object.writerow(task_data)
+                        task_file.close()
+
+                print("Showing today's task(s)")
+                return redirect(url_for('tasks'))
+
+            # Update end_time_index and end_time_value for this new task
+            # end_time_index = start_time_index + quarter_hours[duration_index]  # Index of times
+            # end_time_value = times[end_time_index][1]
+            #
+            # print(f"start_time_index = {start_time_index}")
+            # print(f"start_time_value = {start_time_value}")
+            # print(f"duration_index   = {duration_index}")
+            # print(f"quarter_hours    = {quarter_hours[duration_index]}")
+            # print(f"len(times)       = {len(times)}")
+            # print(f"end_time_index   = {end_time_index}")
+            # print(f"end_time_value]  = {end_time_value}")
+            #
+            # end_time_index = start_time_index + quarter_hours[duration_index]  # Index of times
+            # end_time_value = times[end_time_index][1]
+            #
+            # task_number += 1
+            # task_data = [task_number, task_name, start_time_index, start_time_value,
+            #              duration_index, duration_value,
+            #              end_time_index, end_time_value, priority_value]
+            #
+            # # ETP Tasks CSV file for today does NOT exist; create it
+            # with open(filename, mode="w") as task_file:
+            #     writer_object = writer(task_file)
+            #     writer_object.writerow(task_data)
+            #     task_file.close()
+            #
+            # return redirect(url_for('tasks'))
+
+    return render_template('add.html', form=task_form)
+
+
+@app.route('/tasks')
+def tasks():
+    """Loads CSV task data file and lists task data"""
+
+    print("tasks")
+    iso_date = str(date.today())
+    filename = "etp_tasks_" + iso_date + ".csv"
+
+    global end_time_index
+
+    # Check to see if csv file exists
+    if os.path.exists(filename):
+
+        print(f"{filename} file exists")
+
+        # Comma-separated value file for today's tasks exists. Open in read mode
+        with open(filename, mode='r') as task_file:
+            tasks_csv_data = reader(task_file)
+            tasks_list = []
+            for task in tasks_csv_data:
+                tasks_list.append(task)
+                end_time_index = int(task[6])
+            task_file.close()
+
+        task_count = len(tasks_list)
+        print(f"task_count = {task_count}")
+        print(f"end_time_index = {end_time_index}")
+
+        today = datetime.now()
+        formatted_date = today.strftime("%A, %B %d, %Y")
+
+        # Now go show users what tasks have been defined for today
+        return render_template('tasks.html', today=formatted_date, tasks=tasks_list, count=task_count)
+
+    else:
+
+        # File does NOT exist. Display error message
+        error_message = f"Missing {filename} file"
+        return render_template('error.html', message=error_message)
+
+
+@app.route('/etp')
+def etp():
+    """Loads CSV task data file and displays Emergent Task Planner with tasks"""
+
+    if len(times) == 0:
+        create_times()
+
+    iso_date = str(date.today())
+    filename = "etp_tasks_" + iso_date + ".csv"
+
+    # Check to see if csv file exists
+    if os.path.exists(filename):
+
+        today = datetime.now()
+        formatted_date = today.strftime("%A, %B %d, %Y")
+
+        # Comma-separated value file for today's tasks exists. Open in read mode
+        with open(filename, mode='r') as task_file:
+            tasks_csv_data = reader(task_file)
+            tasks_list = []
+            for task in tasks_csv_data:
+                # Format for class names in etp.html web page entries
+                task_number           = task[0]                       # 1-9
+                task_name             = task[1]                       # string
+                task_start_time_index = f"qblock{int(task[2]):02d}"   # quarter hour start block number qblock00-qblock57
+                task_start_time_value = task[3]                       # HH:MM AM/PM
+                task_duration         = f"quarter{quarter_hours[int(task[4])]:02d}"  # duration block vertical size
+                task_duration_value   = task[5]                       # 15, 30, 45, 60, 120, 180, 240 minutes
+                task_end_time_index   = f"qblock{int(task[6]):02d}"   # quarter hour block number qblock00-qblock57
+                task_end_time_value   = task[7]                       # HH:MM AM/PM
+                task_priority_value   = f"task-{task[8].lower()}"     # "task-low", "task-medium", "task-high"
+                task_data = [task_number, task_name,
+                             task_start_time_index, task_start_time_value,
+                             task_duration, task_duration_value,
+                             task_end_time_index, task_end_time_value,
+                             task_priority_value]
+                tasks_list.append(task_data)
+            task_file.close()
+
+        # Now go show users what tasks have been defined for today
+        return render_template('etp.html', date=formatted_date, tasks=tasks_list)
+
+    else:
+
+        # File does NOT exist. Display error message
+        error_message = f"Missing {filename} file"
+        return render_template('error.html', message=error_message)
+
+
+if __name__ == '__main__':
+    app.run(debug=True)

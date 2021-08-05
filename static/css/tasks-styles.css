@@ -1,0 +1,65 @@
+/******************************************************************************/
+/* Name    : tasks-styles.css                                                 */
+/* Author  : John J Cupak Jr                                                  */
+/* History : 2021-08-03 Created                                               */
+/******************************************************************************/
+
+h1 {
+    text-align      : center;
+}
+
+/******************************************************************************/
+/* Tasks table border, font, padding, and caption                             */
+/******************************************************************************/
+table, thead, th, td {
+    border           : 1px #ccc solid;
+    font-family      : sans-serif;
+    margin           : auto; /* Center align table */
+}
+table {
+    border-collapse  : collapse;
+}
+caption {
+    caption-side     : bottom;
+    padding-top      : 10px;
+    font-size        : large;
+}
+th, td {
+    padding          : 10px;
+}
+
+/******************************************************************************/
+/* Tasks table cell alignments                                                */
+/******************************************************************************/
+.task-number {
+    text-align       : center;
+}
+.task-name {
+    text-align       : left;
+}
+.task-start,
+.task_end {
+    text-align       : right;
+}
+.task-duration {
+    text-align       : right;
+}
+.task-priority {
+    text-align       : center;
+}
+
+/******************************************************************************/
+/* Tasks table cell colors                                                    */
+/******************************************************************************/
+thead {
+    background       : lavender;
+}
+.Low {
+    background-color : LemonChiffon;
+}
+.Medium {
+    background-color : Honeydew;
+}
+.High {
+    background-color : LightPink;
+}

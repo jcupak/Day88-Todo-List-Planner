@@ -1,0 +1,136 @@
+{% extends 'bootstrap/base.html' %}
+
+{% block metas %}
+    <meta name="viewport"    content="width=device-width, initial-scale=1, user-scalable=no" />
+    <meta name="description" content="Day 88 To Do List Planner Tasks page"                  />
+	<meta name="author"      content="John J Cupak Jr, jcupak@acm.org"                       />
+{% endblock %}
+
+{% block styles %}
+{{super()}}
+<style type="text/css">
+    .wrapper {
+        width                 : 800px;
+        height                : 600px;
+        background-image      : url("static/images/tasks-bg.jpg");
+        background-size       : 800px;
+        background-repeat     : no-repeat;
+        background-attachment : fixed;
+        background-position   : top left;
+        display               : flex;
+        align-items           : center;
+    }
+    .container {
+        width                 : 600px;
+        height                : 600px;
+        padding               : 5px;
+        display               : flex;
+        flex-direction        : column; /* vertical */
+        align-items           : center;
+    }
+    /*  Glassmorphism style from https://glassmorphism.com */
+    .glassmorphism {
+      background-color        : rgba( 255, 255, 255, 0.25 );
+      box-shadow              : 0 8px 32px 0 rgba( 31, 38, 135, 0.37 );
+      backdrop-filter         : blur( 4px );
+      -webkit-backdrop-filter : blur( 4px );
+      border-radius           : 10px;
+      border                  : 1px solid rgba( 255, 255, 255, 0.18 );
+    }
+
+    h1 {text-align      : center;}
+
+    /******************************************************************************/
+    /* Tasks table border, font, padding, and caption                             */
+    /******************************************************************************/
+    table {width: 600px;}
+    table, thead, th, td {
+        background       : white; /* Fill so background doesn't show */
+        border           : 1px #ccc solid;
+        font-family      : sans-serif;
+        margin           : auto; /* Center align table */
+    }
+    table {border:3px #ccc solid; border-collapse:collapse;}
+    caption {
+        caption-side     : top;
+        padding-top      : 10px;
+        font-size        : large;
+        text-align       : center;
+    }
+    th, td {padding:10px;}
+
+    /******************************************************************************/
+    /* Tasks table cell alignments                                                */
+    /******************************************************************************/
+    .task-number {text-align:center;}
+    .task-name {text-align:left;}
+    .task-start, .task_end {text-align:right;}
+    .task-duration {text-align:right;}
+    .task-priority {text-align:center;}
+    /******************************************************************************/
+    /* Tasks table cell colors                                                    */
+    /******************************************************************************/
+    thead tr th{background-color: #eee;} /* Very light gray */
+    .Low {background-color:LemonChiffon;}
+    .Medium {background-color:Honeydew;}
+    .High {background-color:LightPink;}
+</style>
+{% endblock %}
+
+{% block title %}All Tasks{% endblock %}
+
+{% block content %}
+<div class="wrapper">
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-12">
+
+                <h1 class="display-4">TO DO List</h1>
+
+                <table class="table">
+                    <caption>Tasks for {{today}}</caption>
+                    <thead>
+                        <th>#</th>
+                        <th>Task Name/</br>Description</th>
+                        <th>Start</br>Time</th>
+                        <th>Duration</br>(Minutes)</th>
+                        <th>End</br>Time</th>
+                        <th>Task</br>Priority</th>
+                    </thead>
+                    <tbody>
+                    {% for task in tasks %}
+                        <tr>
+                            <th class="task-number">{{ task[0] }}</th><
+                            <th class="task-name">{{ task[1] }}</th>
+                             <!-- Omitted: task_start_index task[2] -->
+                            <td class="task-start">{{ task[3] }}</td>
+                            <!-- Omitted: duration_index task[4] -->
+                            <td class="task-duration">{{ task[5] }}</td>
+                             <!-- Omitted: task_end_index task[6] -->
+                            <td class="task_end">{{ task[7] }}</td>
+                            <td class="task-priority {{ task[8] }}">{{ task[8] }}</td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+
+                <p>
+                    <a  class="btn btn-primary btn-lg" role="button"
+                        href="{{ url_for('home') }}">Home page</a>
+
+                    <!--  Allow user to enter an additional task if not nine tasks -->
+                    {% if count < 9 %}
+                        <a  class="btn btn-primary btn-lg" role="button"
+                            href="{{ url_for('add_task') }}">Add task</a>
+                    {% endif %}
+
+                    <a class="btn btn-primary btn-lg" role="button"
+                       href="{{ url_for('etp') }}">Show Tasks on ETP</a>
+                </p>
+
+            </div><!-- end class .col-sm-12 -->
+        </div><!-- end class .row -->
+    </div><!-- end class .container -->
+</div><!-- end class .wrapper -->
+
+{% endblock %}

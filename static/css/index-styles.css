@@ -1,0 +1,14 @@
+html body {
+    background: navy url('../images/home-bg.jpg') no-repeat top left fixed !important;
+    -webkit-background-size: contain;
+    -moz-background-size: contain;
+    background-size: contain;
+    background-attachment: fixed;
+    margin:10px;
+}
+.wrapper {
+    width      : 600px;
+    height     : 400px;
+    border     : solid 1px red !important;
+    text-align : center !important;
+}
