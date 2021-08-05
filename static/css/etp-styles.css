@@ -1,0 +1,265 @@
+/******************************************************************************/
+/* Name    : etp-styles.css                                                   */
+/* Author  : John J Cupak Jr                                                  */
+/* History : 2021-07-27 Created                                               */
+/*           2021-08-03 Moved background image to body                        */
+/******************************************************************************/
+
+:root {
+  /* www.visibone.com/vaccc - Visibone Anglo-Centric Color Code      */
+
+  /* Columns 2 and 3 - 60 and 15 minute block fill and border colors */
+  --block-fill          : #9cf; /* Pale Dull Azure                   */
+  --block-border        : #39f; /* Light Hard Azure                  */
+  --break-fill          : #f96; /* Light Orange Red                  */
+  --break-border        : #f60; /* Orange Orange Red                 */
+
+  /* Column 4 and 5 task priority fill and border colors             */
+  --task-low-fill       : #ffc; /* Pale Weak Yellow                  */
+  --task-low-border     : #ff0; /* Yellow                            */
+  --task-medium-fill    : #cfc; /* Pale Weak Green                   */
+  --task-medium-border  : #0f0; /* Green                             */
+  --task-high-fill      : #fcc; /* Pale Weak Red                     */
+  --task-high-border    : #f00; /* Red                               */
+
+  /* Column 4 and 5 task text colors                                 */
+  --text-color          : #00f; /* Blue                              */
+  --block-text          : #000; /* Black                             */
+}
+
+body {
+  width                 :  8.5in;
+  height                : 11.0in;
+  margin                :  0;
+  padding               :  0;
+}
+
+/******************************************************************************/
+/* Background Emergent Task Planner Image placement and size                  */
+/******************************************************************************/
+img.etp {
+  top       : 0;
+  left      : 0;
+  position  : absolute;
+  margin    : 0;
+  padding   : 0;
+  width     : 8.5in;
+  height    : 11.0in;
+}
+
+/******************************************************************************/
+/* Today's date appears at top of The ETP                                     */
+/******************************************************************************/
+.date {
+  position  : fixed;
+  top       : 24pt;
+  left      : 98px;
+  color     : var(--text-color);
+  font-size : 13pt;
+}
+
+/******************************************************************************/
+/* Column 1 - Day Grid Start Times 8:00 AM to 9:00 PM                         */
+/******************************************************************************/
+.time  {position:absolute; left:57pt; font-size:8pt;}
+.time08{top: 54.5pt;}
+.time09{top:105.5pt;}
+.time10{top:156.0pt;left:55pt;}
+.time11{top:206.5pt;left:55pt;}
+.time12{top:257.0pt;left:55pt; color: var(--break-border);} /* Mid Break */
+.time13{top:308.0pt;} /* 1:00 PM */
+.time14{top:359.0pt;}
+.time15{top:410.0pt;}
+.time16{top:461.0pt;}
+.time17{top:511.5pt; color:var(--break-border)} /* Late break */
+.time18{top:562.5pt;}
+.time19{top:613.0pt;}
+.time20{top:664.0pt;}
+.time21{top:714.5pt;}
+
+/******************************************************************************/
+/* Column 2 - Day Grid task schedule hour blocks                              */
+/******************************************************************************/
+/******************************************************************************/
+/* Column 3 - Day Grid task schedule quarter-hour blocks                      */
+/******************************************************************************/
+/******************************************************************************/
+/* Column 4 - Day Grid task names and schedule blocks                         */
+/******************************************************************************/
+.duration-blocks {}
+
+/* Set left position, width, and border style and width of duration blocks */
+.duration {
+    position     : fixed;
+    left         : 140px;
+    width        : 145px;
+    z-index      : 1;
+    border-style : solid;
+    border-width : 1px;
+}
+
+/* Start time (top) of duration blocks */
+
+/*  8:00 AM -  8:45 AM */
+.qblock00 {top: 72.5px;}
+.qblock01 {top: 89.5px;}
+.qblock02 {top:106.5px;}
+.qblock03 {top:123.5px;}
+
+/*  9:00 AM -  9:45 AM */
+.qblock04 {top:140.5px;}
+.qblock05 {top:157.5px;}
+.qblock06 {top:174.5px;}
+.qblock07 {top:191.5px;}
+
+/* 10:00 AM - 10:45 AM */
+.qblock08 {top:208.5px;}
+.qblock09 {top:225.5px;}
+.qblock10 {top:242.5px;}
+.qblock11 {top:259.5px;}
+
+/* 11:00 AM - 11:45 AM */
+.qblock12 {top:276.5px;}
+.qblock13 {top:293.5px;}
+.qblock14 {top:310.5px;}
+.qblock15 {top:327.5px;}
+
+/* 12:00 AM - 12:45 AM */
+.qblock16 {top:344.5px;}
+.qblock17 {top:361.5px;}
+.qblock18 {top:378.5px;}
+.qblock19 {top:395.5px;}
+
+/*  1:00 PM -  1:45 PM */
+.qblock20 {top:411.5px;}
+.qblock21 {top:428.5px;}
+.qblock22 {top:444.5px;}
+.qblock23 {top:461.5px;}
+
+/*  2:00 PM -  2:45 PM */
+.qblock24 {top:479.0px;}
+.qblock25 {top:496.5px;}
+.qblock26 {top:512.5px;}
+.qblock27 {top:528.0px;}
+
+/*  3:00 PM -  3:45 PM */
+.qblock28 {top:546.0px}
+.qblock29 {top:563.0px;}
+.qblock30 {top:580.0px;}
+.qblock31 {top:596.5px;}
+
+/*  4:00 PM -  4:45 PM */
+.qblock32 {top:614.0px;}
+.qblock33 {top:630.5px;}
+.qblock34 {top:646.5px;}
+.qblock35 {top:664.0px;}
+
+/*  5:00 PM -  5:45 PM */
+.qblock36 {top:681.0px;}
+.qblock37 {top:698.5px;}
+.qblock38 {top:715.5px;}
+.qblock39 {top:732.5px;}
+
+/*  6:00 PM -  6:45 PM */
+.qblock40 {top:749.0px;}
+.qblock41 {top:766.5px;}
+.qblock42 {top:783.5px;}
+.qblock43 {top:800.5px;}
+
+/*  7:00 PM -  7:45 PM */
+.qblock44 {top:816.0px;}
+.qblock45 {top:834.5px;}
+.qblock46 {top:851.5px;}
+.qblock47 {top:867.5px;}
+
+/*  8:00 PM -  8:45 PM */
+.qblock48 {top:884.0px;}
+.qblock49 {top:901.0px;}
+.qblock50 {top:918.0px;}
+.qblock51 {top:935.5px;}
+
+/*  9:00 PM -  9:45 PM */
+.qblock52 {top: 952.0px;}
+.qblock53 {top: 969.5px;}
+.qblock54 {top: 987.5px;}
+.qblock55 {top:1003.0px;}
+
+/* Height of duration blocks in quarter-hours*/
+.quarter01 {height:  15px;} /* 15 minutes */
+.quarter02 {height:  32px;} /* 30 minutes */
+.quarter03 {height:  48px;} /* 45 minutes */
+.quarter04 {height:  64px;} /*  1 hour    */
+.quarter08 {height: 133px;} /*  2 hours   */
+.quarter12 {height: 192px;} /*  3 hours   */
+.quarter16 {height: 270px;} /*  4 hours   */
+
+/* Format of text in duration blocks */
+.text      {
+    color        : var(--block-text, #000, black);
+    font-style   : bold;
+    text-align   : left;
+    font-size    : 9pt;
+    padding-left : 3px;
+}
+
+/******************************************************************************/
+/* Task Priority Legend at top                                                */
+/******************************************************************************/
+.priority-legend {font-size:8pt;}
+.legend-low, .legend-medium, .legend-high    {padding-left:5px;}
+.legend        {position:fixed; left:575px; top:70px;             z-index:5;}
+.legend-low    {position:fixed; left:655px; top:70px; width:50px; z-index:5;}
+.legend-medium {position:fixed; left:695px; top:70px; width:50px; z-index:5;}
+.legend-high   {position:fixed; left:745px; top:70px; width:50px; z-index:5;}
+
+/******************************************************************************/
+/* Columns 3 & 5 - Task Priority colors                                       */
+/******************************************************************************/
+.task-low    {
+  background-color : var(--task-low-fill, #ffc);
+  border-color     : var(--task-low-border, #ff0, yellow);
+}
+.task-medium {
+  background-color : var(--task-medium-fill, #cfc);
+  border-color     : var(--task-medium-border, #0f0, green);
+}
+.task-high   {
+  background-color : var(--task-high-fill, #fcc);
+  border-color     : var(--task-high-border, #f00, red);
+  border-color     : red;
+}
+
+/******************************************************************************/
+/* Column 5 - task 01-09 names/descriptions paragraph colors                  */
+/******************************************************************************/
+p {color: var(--text-color, #00f, blue);}
+
+/******************************************************************************/
+/* Column 5 - task names / descriptions                                       */
+/******************************************************************************/
+.task {
+  position       : fixed;
+  left           : 3.45in;
+  font-size      : 14pt;
+  width          : 248px;
+  padding-bottom : 0;
+  margin-bottom  : 0;
+  padding-left   : 5px;
+}
+
+/* THREE MAJOR TASKS FOR TODAY */
+
+/* Motivation one */
+.task1 {top: 73.0pt;}
+.task2 {top:100.5pt;}
+.task3 {top:127.5pt;}
+
+/* Motivation two */
+.task4 {top:167.0pt;}
+.task5 {top:194.0pt;}
+.task6 {top:221.0pt;}
+
+/* Motivation three */
+.task7 {top:260.0pt;}
+.task8 {top:287.0pt;}
+.task9 {top:314.0pt;}

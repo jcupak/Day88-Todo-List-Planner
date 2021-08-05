@@ -1,0 +1,9 @@
+1,Very important task,0, 8:00 AM,6,240,16,12:00 PM,High
+2,Typical daily task,20, 1:00 PM,3,60,24, 2:00 PM,Medium
+3,Another typical daily task,24, 2:00 PM,3,60,28, 3:00 PM,Medium
+4,A boring task,28, 3:00 PM,0,15,29, 3:15 PM,Low
+5,Another boring task,29, 3:15 PM,0,15,30, 3:30 PM,Low
+6,Meh,30, 3:30 PM,0,15,31, 3:45 PM,Low
+7,Last minute task,32, 4:00 PM,3,60,36, 5:00 PM,Medium
+8,Dinner with wife,48, 8:00 PM,3,60,52, 9:00 PM,High
+9,Plan for tomorrow,52, 9:00 PM,3,60,56,10:00 PM,Medium
