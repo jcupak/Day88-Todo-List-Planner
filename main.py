@@ -11,51 +11,27 @@ app = Flask(__name__)
 app.config['SECRET_KEY'] = "python"
 Bootstrap(app)
 
-times            = []                                        # Quarter hour times from 8:00AM to 9:45PM
-durations        = [(0, 15), (1, 30), (2, 45), (3, 60), (4, 120), (5, 180), (6, 240)]  # (value, label)
-quarter_hours    = [1, 2, 3, 4, 8, 12, 16]
-priorities       = [(0, "Low"), (1, "Medium"), (2, "High")]  # Task priorities
-end_time_index   = 0                                         # Index of previous task end time
-task_number      = 0                                         # Number of task: 1-9
+hours          = [(0, 8), (1, 9), (2, 10), (3, 11), (4, 12),
+                  (5, 1), (6, 2), (7, 3), (8, 4), (9, 5),
+                  (10, 6), (11, 7), (12, 8), (13, 9), (14, 10)]  # 12-hour notations
+military_hours = [8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22]  # 24-hour notation
+quarters       = [(0, 0), (1, 15), (2, 30), (3, 45)]                         # 15-minute quarter-hours
+durations      = [(1, "15 minutes"), (2, "30 minutes"), (3, "45 minutes"),
+                  (4, "1 hour"), (8, "2 hours"), (12, "3 hours"), (16, "4 hours")]
+priorities     = [(0, "Low"), (1, "Medium"), (2, "High")]                                  # Task priorities
 
-
-def create_times():
-    """Fill times list with times from 8:00 AM to 9:45 PM"""
-
-    print("Creating times")
-
-    # Set start time to 8:00 AM
-    hour = 8
-    minutes = 0
-    period = "AM"  # Morning or afternoon
-
-    # Create 56 time items from 8:00 AM to 10:00 PM in 15 minute increments
-    global times
-    for quarter in range(57):
-        time_str = f"{hour:2}:{minutes:02} {period}"
-        time_item = (quarter, time_str)
-        times.append(time_item)  # (0-55 'HH:MM AM/PM')
-        # Set up next time item
-        minutes += 15  # Increment by quarter hour
-        # Check if minutes equal to next hour
-        if minutes == 60:
-            hour += 1  # Increment hour
-            minutes = 0  # Reset minutes
-        # Check if 12 noon and change period designation
-        if hour == 12:
-            period = "PM"  # Change to afternoon
-        # Check if 24 hour time rolled over to afternoon
-        if hour == 13:  # Afternoon
-            hour = 1  # 1:00 PM
+end_time_index = 0  # Index of previous task end time
+task_number    = 0  # Number of task: 1-9
 
 
 # Define input task form
 class TaskForm(FlaskForm):
-    name = StringField('Task Name', validators=[DataRequired()])
-    start_time = SelectField("Start Time", choices=times)
-    duration = SelectField("Duration (minutes)", choices=durations)
-    priority = SelectField("Priority", choices=priorities)
-    submit = SubmitField("Submit Task")
+    name          = StringField('Task Name',     validators=[DataRequired()])
+    start_hour    = SelectField("Start Hour",    choices=hours)
+    start_quarter = SelectField("Start Quarter", choices=quarters)
+    duration      = SelectField("Duration",      choices=durations)
+    priority      = SelectField("Priority",      choices=priorities)
+    submit        = SubmitField("Submit Task")
 
 
 # Flask routes
@@ -67,20 +43,63 @@ def home():
     filename = "etp_tasks_" + iso_date + ".csv"
 
     # Check to see if csv file exists
-    file_is_present = os.path.exists(filename)
+    is_file_present = os.path.exists(filename)
 
-    return render_template("index.html", exists=file_is_present)
+    return render_template("index.html", exists=is_file_present)
+
+
+def standard_time(hour, quarter):
+    """Converts 24-hour military time to AM/PM standard time
+
+    Keyword arguments:
+       hour    -- zero-indexed 24-hour value 0-14 (8:00 AM = 10:00 PM)
+       quarter -- zero-indexed quarter-hour 0, 1, 2, 3
+    """
+
+    print(f"\nstandard_time(hour={hour}, quarter={quarter})")
+
+    period = "AM" if hour < 12 else "PM"  # Morning or afternoon
+    print(f"period={period}")
+
+    standard_hour = hour if hour < 13 else hour - 12  # 8-12 AM or 1-9 PM
+    print(f"standard_hour={standard_hour}")
+
+    quarter_hour = quarter * 15  # 0, 15, 30, 45
+    print(f"quarter_hour={quarter_hour}")
+
+    time_string = "{:2}:{:02} {}".format(standard_hour, quarter_hour, period)  # HH:MM AM/PM
+    print(f"time_string={time_string}")
+
+    return time_string
+
+
+def get_standard_time(time):
+    """Convert time index value to standard time string
+
+    Keyword arguments:
+    time -- time in 0-indexed quarter hours 0-57 (8:00 AM - 10:00 PM)
+
+    """
+
+    print(f"\nget_standard_time({time})")
+
+    hour_index = int(time / 4)  # Extract hour 0-14
+    hour       = 8 + hour_index
+    quarter    = int(time % 4)  # Extract quarter 0-3
+
+    print(f"hour_index={hour_index}, hour={hour}, quarter={quarter}")
+
+    time_string = standard_time(hour, quarter)
+    print(f"time_string={time_string}")
+
+    return time_string  # HH:MM AM/PM
 
 
 @app.route('/add', methods=["GET", "POST"])
 def add_task():
     """Add Task Form page"""
 
-    print("Adding new task")
-
-    global times
-    if len(times) == 0:
-        create_times()
+    print("\nAdding new task")
 
     task_form = TaskForm()
 
@@ -90,24 +109,43 @@ def add_task():
         print("Task Form validated")
 
         # Get form fields
-        print("Extracting form fields")
+        print("Extracting form fields\n")
 
-        task_name = task_form.name.data
+        task_name = task_form.name.data                                 # String
 
-        start_time = task_form.start_time.data
-        start_time_index = int(start_time)
-        start_time_value = times[start_time_index][1]
+        start_hour_index = int(task_form.start_hour.data)               # 0-22 or 8 AM - 10 PM?
+        print(f"start_hour_index = {start_hour_index}")
 
-        duration = task_form.duration.data
-        duration_index = int(duration)
-        duration_value = durations[duration_index][1]
+        start_quarter_index = int(task_form.start_quarter.data)         # 0-3 or 0, 15, 30, 45 minutes?
+        print(f"start_quarter_index = {start_quarter_index}")
 
-        priority = task_form.priority.data
-        priority_index = int(priority)
-        priority_value = priorities[priority_index][1]
+        # Calculate start time index from start hour and start quarter
+        start_time_index = start_hour_index * 4 + start_quarter_index   # Calculated as 0-57
+        print(f"start_time_index = {start_time_index}")
+
+        start_time_string = get_standard_time(start_time_index)         # Convert to 12-hour format
+
+        # 0, 1, 2, 3, 4, 8, 12, 16 quarter hours
+        duration_index = int(task_form.duration.data)                   # 0-16 quarter hours
+        print(f"duration_index = {duration_index}")
+
+        duration_string = dict(durations).get(duration_index)            # string duration
+        print(f"duration_string = {duration_string}")
+        
+        current_task_end_time_index = start_time_index + duration_index       # 0-57
+        print(f"current_task_end_time_index = {current_task_end_time_index}")
+
+        current_task_end_time_string = get_standard_time(current_task_end_time_index)
+        print(f"current_task_end_time_string = {current_task_end_time_string}")
+
+        priority_index = int(task_form.priority.data)                    # 0-2 or string?
+        print(f"priority_index = {priority_index}")
+
+        priority_string = priorities[priority_index][1]
+        print(f"priority_string = {priority_string}")
 
         # Check for this task start time index does not overlap end time index of previous task
-        global end_time_index  # times
+        global end_time_index
 
         today = str(date.today())
         filename = "etp_tasks_" + today + ".csv"
@@ -118,14 +156,14 @@ def add_task():
         # No previous task defined
         if end_time_index == 0:
 
-            print("end_time_index == 0")
+            print(f"\nNo previous task defined")
 
             # ETP Tasks CSV file for today exists
             # Open and get last task information
             # Update last task end_time_index
             if os.path.isfile(filename):
 
-                print(f"{filename} exists")
+                print(f"\nExternal CSV file {filename} exists")
 
                 task_number = 0
                 with open(filename, mode='r') as task_file:
@@ -133,17 +171,26 @@ def add_task():
                     for task in tasks_csv_data:
                         task_number += 1  # Count tasks
                     task_file.close()
+                print(f"Previous task_number = {task_number}")
 
-                end_time_index = start_time_index + quarter_hours[duration_index]  # Index of times
-                end_time_value = times[end_time_index][1]
+                # Get end time for this task
+                print("\nGet end time for this task")
+
+                end_time_index = current_task_end_time_index  # Save current end index
+                print(f"end_time_index = {end_time_index}")
+
+                end_time_string = get_standard_time(end_time_index)
+                print(f"end_time_string = {end_time_string}")
 
                 task_number += 1  # Count new task from form
-                task_data = [task_number, task_name, start_time_index, start_time_value,
-                             duration_index, duration_value,
-                             end_time_index, end_time_value, priority_value]
+                task_data = [task_number, task_name, 
+                             start_time_index, start_time_string,
+                             duration_index, duration_string,
+                             end_time_index, end_time_string, 
+                             priority_string]
 
                 # Now append new task form data
-                print("Appending new task to existing file")
+                print("\nAppending new task to existing file")
 
                 with open(filename, mode="a") as task_file:
                     writer_object = writer(task_file)
@@ -155,68 +202,89 @@ def add_task():
             # Update last task end_time_index
             else:
 
-                print(f"{filename} does NOT exist")
+                print(f"\nExternal CSV file {filename} does NOT exist")
 
                 # Update end_time for this task
-                end_time_index = start_time_index + quarter_hours[duration_index]  # Index of times
-                end_time_value = times[end_time_index][1]
+                # end_time_index = start_time_index + quarter_hours[duration_index]
+                # end_time_string = times[end_time_index][1]
+                # Get end time for this task
+                print("Get end time for this task")
+
+                end_time_index = current_task_end_time_index
+                print(f"end_time_index = {end_time_index}")
+
+                end_time_string = get_standard_time(end_time_index)
+                print(f"end_time_string = {end_time_string}")
 
                 task_number = 1  # First task info
-                task_data = [task_number, task_name, start_time_index, start_time_value,
-                             duration_index, duration_value,
-                             end_time_index, end_time_value, priority_value]
+                task_data = [task_number, task_name, 
+                             start_time_index, start_time_string,
+                             duration_index, duration_string,
+                             end_time_index, end_time_string, 
+                             priority_string]
 
                 # Now write first task information
-                print("Writing new task to new file")
+                print("\nWriting new task to new file")
 
                 with open(filename, mode="w") as task_file:
                     writer_object = writer(task_file)
                     writer_object.writerow(task_data)
                     task_file.close()
 
-            print("Showing today's task(s)")
+            print("\nShowing today's task(s)")
             return redirect(url_for('tasks'))
 
         # Previous task exists
         # Check for task time overlap
         else:
 
-            print("Previous task exists")
+            print("\nPrevious task exists")
             print(f"start_time_index = {start_time_index}, end_time_index = {end_time_index}")
 
-            # Check for task time overlap
+            # Check for current task start time overlap with previous task end time
             if start_time_index < end_time_index:
 
-                print("ERROR: Task times overlap")
+                print("\nERROR: Task times overlap")
 
                 # ERROR: This task start time overlaps the previous task end time
+                previous_task_end_time = get_standard_time(end_time_index)  # HH:MM AM/PM
+                print(f"previous_task_end_time = {previous_task_end_time}")
 
-                previous_task_end_time = times[end_time_index][1]     # HH:MM AM/PM
-                current_task_start_time = times[start_time_index][1]  # HH:MM AM/PM
-                error_message = f"{current_task_start_time} start time of current task "\
-                                f"can not be before {previous_task_end_time} end time of previous task."
+                current_task_start_time = get_standard_time(start_time_index)  # HH:MM AM/PM
+                print(f"current_task_start_time = {current_task_start_time}")
+
+                error_message = "{} start time of current task can not be before " + \
+                                "{} end time of previous task." \
+                                   .format(current_task_start_time, previous_task_end_time)
                 return render_template("error.html", message=error_message)
 
             # No overlap - write current task info
             else:
 
-                print("Task times do NOT overlap")
+                print("\nTask times do NOT overlap")
 
                 # ETP Tasks CSV file exists; append data
                 if os.path.isfile(filename):
 
-                    print(f"{filename} exists")
+                    print(f"\nExternal CSV file {filename} exists")
 
                     # Update end_time for this task
-                    end_time_index = start_time_index + quarter_hours[duration_index]  # Index of times
-                    end_time_value = times[end_time_index][1]
+                    end_time_index = current_task_end_time_index
+                    print(f"end_time_index = {end_time_index}")
+
+                    end_time_string = get_standard_time(end_time_index)
+                    print(f"end_time_string = {end_time_string}")
 
                     task_number += 1
-                    task_data = [task_number, task_name, start_time_index, start_time_value,
-                                 duration_index, duration_value,
-                                 end_time_index, end_time_value, priority_value]
+                    task_data = [task_number, task_name, 
+                                 start_time_index, start_time_string,
+                                 duration_index, duration_string,
+                                 end_time_index, end_time_string, 
+                                 priority_string]
 
                     # Append this task data to existing file
+                    print("\nAppending new task to existing file")
+
                     with open(filename, mode="a") as task_file:
                         writer_object = writer(task_file)
                         writer_object.writerow(task_data)
@@ -226,55 +294,34 @@ def add_task():
                 # create and write new task data
                 else:
 
-                    print(f"{filename} does NOT exists")
+                    print(f"\nExternal CSV file {filename} does NOT exists")
 
                     # ETP Tasks CSV file for today does NOT exist; create it
 
                     # Update end_time for this task
-                    end_time_index = start_time_index + quarter_hours[duration_index]  # Index of times
-                    end_time_value = times[end_time_index][1]
+                    end_time_index = current_task_end_time_index
+                    print(f"end_time_index = {end_time_index}")
+
+                    end_time_string = get_standard_time(end_time_index)
+                    print(f"end_time_string = {end_time_string}")
 
                     task_number += 1
-                    task_data = [task_number, task_name, start_time_index, start_time_value,
-                                 duration_index, duration_value,
-                                 end_time_index, end_time_value, priority_value]
+                    task_data = [task_number, task_name, 
+                                 start_time_index, start_time_string,
+                                 duration_index, duration_string,
+                                 end_time_index, end_time_string, 
+                                 priority_string]
 
                     # Write new file with this task data
+                    print("\nWriting new task to new file")
+
                     with open(filename, mode="w") as task_file:
                         writer_object = writer(task_file)
                         writer_object.writerow(task_data)
                         task_file.close()
 
-                print("Showing today's task(s)")
+                print("\nShowing today's task(s)")
                 return redirect(url_for('tasks'))
-
-            # Update end_time_index and end_time_value for this new task
-            # end_time_index = start_time_index + quarter_hours[duration_index]  # Index of times
-            # end_time_value = times[end_time_index][1]
-            #
-            # print(f"start_time_index = {start_time_index}")
-            # print(f"start_time_value = {start_time_value}")
-            # print(f"duration_index   = {duration_index}")
-            # print(f"quarter_hours    = {quarter_hours[duration_index]}")
-            # print(f"len(times)       = {len(times)}")
-            # print(f"end_time_index   = {end_time_index}")
-            # print(f"end_time_value]  = {end_time_value}")
-            #
-            # end_time_index = start_time_index + quarter_hours[duration_index]  # Index of times
-            # end_time_value = times[end_time_index][1]
-            #
-            # task_number += 1
-            # task_data = [task_number, task_name, start_time_index, start_time_value,
-            #              duration_index, duration_value,
-            #              end_time_index, end_time_value, priority_value]
-            #
-            # # ETP Tasks CSV file for today does NOT exist; create it
-            # with open(filename, mode="w") as task_file:
-            #     writer_object = writer(task_file)
-            #     writer_object.writerow(task_data)
-            #     task_file.close()
-            #
-            # return redirect(url_for('tasks'))
 
     return render_template('add.html', form=task_form)
 
@@ -308,7 +355,7 @@ def tasks():
         print(f"end_time_index = {end_time_index}")
 
         today = datetime.now()
-        formatted_date = today.strftime("%A, %B %d, %Y")
+        formatted_date = today.strftime("%A, %B %d, %Y")  # Day name, Month day, year
 
         # Now go show users what tasks have been defined for today
         return render_template('tasks.html', today=formatted_date, tasks=tasks_list, count=task_count)
@@ -316,7 +363,7 @@ def tasks():
     else:
 
         # File does NOT exist. Display error message
-        error_message = f"Missing {filename} file"
+        error_message = "Missing external CSV file {}".format(filename)
         return render_template('error.html', message=error_message)
 
 
@@ -324,8 +371,7 @@ def tasks():
 def etp():
     """Loads CSV task data file and displays Emergent Task Planner with tasks"""
 
-    if len(times) == 0:
-        create_times()
+    print(f"\nEmergent Task Planner (ETP) Form Page")
 
     iso_date = str(date.today())
     filename = "etp_tasks_" + iso_date + ".csv"
@@ -333,30 +379,40 @@ def etp():
     # Check to see if csv file exists
     if os.path.exists(filename):
 
+        print(f"External CSV file {filename} exists.")
+
         today = datetime.now()
-        formatted_date = today.strftime("%A, %B %d, %Y")
+        formatted_date = today.strftime("%A, %B %d, %Y")    # Day name, Month day, year
+        print(f"formatted_date = {formatted_date}")
 
         # Comma-separated value file for today's tasks exists. Open in read mode
         with open(filename, mode='r') as task_file:
             tasks_csv_data = reader(task_file)
             tasks_list = []
             for task in tasks_csv_data:
+
+                print(task)
+
                 # Format for class names in etp.html web page entries
-                task_number           = task[0]                       # 1-9
-                task_name             = task[1]                       # string
-                task_start_time_index = f"qblock{int(task[2]):02d}"   # quarter hour start block number qblock00-qblock57
-                task_start_time_value = task[3]                       # HH:MM AM/PM
-                task_duration         = f"quarter{quarter_hours[int(task[4])]:02d}"  # duration block vertical size
-                task_duration_value   = task[5]                       # 15, 30, 45, 60, 120, 180, 240 minutes
-                task_end_time_index   = f"qblock{int(task[6]):02d}"   # quarter hour block number qblock00-qblock57
-                task_end_time_value   = task[7]                       # HH:MM AM/PM
-                task_priority_value   = f"task-{task[8].lower()}"     # "task-low", "task-medium", "task-high"
+                task_number = task[0]  # 1-9
+                task_name = task[1]  # string
+                # quarter hour start block number qblock00-qblock57
+                task_start_time_index = "qblock{:02d}".format(int(task[2]))
+                task_start_time_string = task[3]  # HH:MM AM/PM
+                # duration block vertical size
+                task_duration = "quarter{:02d}".format(int(task[4]))
+                task_duration_string = task[5]  # 15, 30, 45, 60, 120, 180, 240 minutes
+                # quarter hour block number qblock00-qblock57
+                task_end_time_index = "qblock{:02d}".format(int(task[6]))
+                task_end_time_string = task[7]  # HH:MM AM/PM
+                task_priority_value = "task-{}".format(task[8].lower())
                 task_data = [task_number, task_name,
-                             task_start_time_index, task_start_time_value,
-                             task_duration, task_duration_value,
-                             task_end_time_index, task_end_time_value,
+                             task_start_time_index, task_start_time_string,
+                             task_duration, task_duration_string,
+                             task_end_time_index, task_end_time_string,
                              task_priority_value]
                 tasks_list.append(task_data)
+
             task_file.close()
 
         # Now go show users what tasks have been defined for today
@@ -365,7 +421,7 @@ def etp():
     else:
 
         # File does NOT exist. Display error message
-        error_message = f"Missing {filename} file"
+        error_message = "Missing external CSV file {}".format(filename)
         return render_template('error.html', message=error_message)
 
 
