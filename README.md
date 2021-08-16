@@ -10,4 +10,4 @@ Based on David Seah's [The Emergent Task Planner][etp] with 9 tasks
 This is a ![sample][sample_etp] from thie program.
 
 [etp]: https://davidseah.com/node/the-emergent-task-planner/
-[sample_etp]:(https://github.com/jcupak/Day88-Todo-List-Planner/ToDo List EPT.png)
+[sample_etp]:(https://github.com/jcupak/Day88-Todo-List-Planner/blob/main/To%20Do%20List%20ETP.png)
