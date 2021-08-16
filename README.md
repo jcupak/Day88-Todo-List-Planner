@@ -8,6 +8,9 @@ Plan up to nine (9) tasks for the day with start times, durations, and prioritie
 Based on David Seah's [The Emergent Task Planner][etp] with 9 tasks
 
 ## Instructions
+Download the main.py, with the contents of the static folder and template folder.
+
+### `Python3 main.py`
 
 ## Built With
 - Python
@@ -25,7 +28,7 @@ Based on David Seah's [The Emergent Task Planner][etp] with 9 tasks
 **John Cupak**
 
 - [Profile]()
-- [Email])mailto:jcupak@acm.org?subject=TODO%20List%20ETP)
+- [Email](mailto:jcupak@acm.org?subject=TODO%20List%20ETP)
 
 # Support
 Contributions, issues, and feature requests are welcome!
@@ -33,10 +36,10 @@ Give me a 🌟 if you like this project!
 
 ## Screenshots
 
-![Home Page - No Tasks]()
-![Home Page - Tasks]()
-![Show Tasks - 8 Tasks]()
-![Show Tasks - 9 Tasks]()
+![Home Page - No Tasks](https://github.com/jcupak/Day88-Todo-List-Planner/blob/main/To%20Do%20List%20ETP%20Home%200.png)
+![Home Page - Tasks](https://github.com/jcupak/Day88-Todo-List-Planner/blob/main/To%20Do%20List%20ETP%20Home%201.png)
+![Show Tasks - 8 Tasks](https://github.com/jcupak/Day88-Todo-List-Planner/blob/main/To%20Do%20List%20ETP%20Tasks%208.png)
+![Show Tasks - 9 Tasks](https://github.com/jcupak/Day88-Todo-List-Planner/blob/main/To%20Do%20List%20ETP%20Tasks%209.png)
 ![Completed ETP](https://github.com/jcupak/Day88-Todo-List-Planner/blob/main/To%20Do%20List%20ETP.png?raw=true/)
 
 [etp]: https://davidseah.com/node/the-emergent-task-planner/
