@@ -7,7 +7,7 @@ Plan up to nine (9) tasks for the day with start times, durations, and prioritie
 
 Based on David Seah's [The Emergent Task Planner][etp] with 9 tasks
 
-This is a ![sample][sample_etp] from thie program.
+This is a ![sample](https://github.com/jcupak/Day88-Todo-List-Planner/blob/main/To%20Do%20List%20ETP.png?raw=true/) from thie program.
 
 [etp]: https://davidseah.com/node/the-emergent-task-planner/
-[sample_etp]:(https://github.com/jcupak/Day88-Todo-List-Planner/blob/main/To%20Do%20List%20ETP.png)
+
